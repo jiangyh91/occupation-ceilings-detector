@@ -2,7 +2,7 @@ const electron = require("electron");
 const path = require("path");
 const isDev = require("electron-is-dev");
 
-const { app, BrowserWindow, session } = electron;
+const { app, BrowserWindow } = electron;
 
 let mainWindow;
 function createWindow() {
@@ -12,24 +12,13 @@ function createWindow() {
   const url = isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`;
   mainWindow.loadURL(url);
 
-  // if (isDev) {
-  // Open the DevTools.
-  // BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
-  mainWindow.webContents.openDevTools();
-  // }
+  if (isDev) {
+    // Open the DevTools.
+    // BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
+    mainWindow.webContents.openDevTools();
+  }
   mainWindow.on("closed", () => (mainWindow = null));
 }
-
-// function initSession() {
-//   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-//     callback({
-//       responseHeaders: {
-//         ...details.responseHeaders,
-//         "Content-Security-Policy": ["default-src 'none'"]
-//       }
-//     });
-//   });
-// }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
