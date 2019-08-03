@@ -11,6 +11,7 @@
 # production
 /build
 /dist
+/electron-build
 
 # misc
 .DS_Store

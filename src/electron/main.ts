@@ -2,21 +2,29 @@ import * as electron from 'electron';
 import * as isDev from 'electron-is-dev';
 import * as path from 'path';
 
-const { app, BrowserWindow } = electron;
+import { listeners } from './listeners';
+
+const { app, BrowserWindow, ipcMain } = electron;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow | null;
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 900, height: 680 });
+  mainWindow = new BrowserWindow({
+    width: 900,
+    height: 680,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
   const url = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`;
   mainWindow.loadURL(url);
-
+  console.log();
   if (isDev) {
     // Open the DevTools.
     // BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   }
   mainWindow.on('closed', () => (mainWindow = null));
 }
@@ -40,4 +48,9 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+listeners.forEach(item => {
+  const { channel, listener } = item;
+  ipcMain.on(channel, listener);
 });
