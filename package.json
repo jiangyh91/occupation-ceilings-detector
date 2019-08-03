@@ -15,6 +15,13 @@
   },
   "main": "electron-build/main.js",
   "homepage": ".",
+  "build": {
+    "files": [
+      "build/**/*",
+      "electron-build/**/*"
+    ],
+    "extends": null
+  },
   "eslintConfig": {
     "extends": "react-app"
   },
