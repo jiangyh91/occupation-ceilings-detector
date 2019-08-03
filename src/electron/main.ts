@@ -20,7 +20,6 @@ function createWindow() {
   });
   const url = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`;
   mainWindow.loadURL(url);
-  console.log();
   if (isDev) {
     // Open the DevTools.
     // BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');

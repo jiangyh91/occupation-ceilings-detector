@@ -1,15 +1,14 @@
 import './App.css';
 
-import { ipcRenderer } from 'electron';
 import React from 'react';
 
-import { INITIALISE_TIMER } from '../../electron/channel';
+import { fetchPageData } from '../../electron/listeners';
 import logo from './logo.svg';
 
 class App extends React.PureComponent {
   componentDidMount() {
-    ipcRenderer.send(INITIALISE_TIMER, 1, 2, 3);
-    console.log(window);
+    // ipcRenderer.send(INITIALISE_TIMER);
+    fetchPageData();
   }
   render() {
     return (
