@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as fs from 'fs';
 import { DOMParser } from 'xmldom';
 
 import { INITIALISE_TIMER } from './channel';
@@ -20,6 +21,13 @@ function initialiseTimerListener(event: any, arg: number = 600) {
   fetchPageData();
 }
 
+interface OccupationCeilingRecord {
+  occupationId: string | null;
+  description: string | null;
+  occupationCeilingValue: string | null;
+  invitationValue: string | null;
+}
+
 let timer: NodeJS.Timeout;
 export function fetchPageData() {
   const url = 'https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/occupation-ceilings';
@@ -28,12 +36,27 @@ export function fetchPageData() {
     console.log(`STATUS: ${response.status}`);
     const pageDom = new DOMParser().parseFromString(data, 'text/xml');
     const containerDom = pageDom.getElementById('ctl00_PlaceHolderMain_ctl04__ControlWrapper_RichHtmlField');
-    if (containerDom == null) {
-      console.log('Get containerDom failed');
-      return;
+    const tableDom = containerDom!.getElementsByTagName('table')[0];
+    const trList = tableDom.childNodes[0].childNodes;
+
+    const invitationDate = trList[0].childNodes[3].textContent;
+    const date = new Date(invitationDate || '').toISOString().slice(0, 10);
+
+    const length = trList.length;
+    let result: Array<OccupationCeilingRecord> = [];
+    for (let i = 1; i < length; i++) {
+      const tdList = trList[i].childNodes;
+      result.push({
+        occupationId: tdList[0].textContent,
+        description: tdList[1].textContent,
+        occupationCeilingValue: tdList[2].textContent,
+        invitationValue: tdList[3].textContent
+      });
     }
-    const tableDom = containerDom.getElementsByTagName('table')[0];
-    const invitationDate = tableDom.children[0].children[0].children[3].innerHTML;
-    const date = new Date(invitationDate).toISOString().slice(0, 10);
+    const newData = [{ date, records: result }];
+    const path = './occupationData.json';
+    fs.writeFile(path, JSON.stringify(newData), 'utf8', () => {
+      console.log(`${path} saved`);
+    });
   });
 }
